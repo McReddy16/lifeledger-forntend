@@ -1,0 +1,139 @@
+/* ===============================
+   SCROLLABLE CARDS CONTAINER
+   =============================== */
+.dashboard-content {
+  flex: 1;
+  overflow-y: auto;        /* ✅ ONLY this scrolls */
+  padding: 24px;
+}
+
+
+
+/* ===============================
+   TASKS PAGE GRID (2 x 2)
+   =============================== */
+.tasks-page {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);   /* 🔒 2 columns like image */
+  gap: 24px;
+  width: 100%;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+/* ===============================
+   TASK CARD
+   =============================== */
+.task-card {
+  background: linear-gradient(160deg, #0f172a, #020617);
+  border-radius: 22px;
+  padding: 20px;
+  color: #e5e7eb;
+
+  height: 300px;                 /* 🔒 fixed card height */
+  display: flex;
+  flex-direction: column;
+
+  box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+}
+
+/* ===============================
+   CARD TITLE
+   =============================== */
+.task-card h3 {
+  margin: 0 0 14px 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* ===============================
+   INPUT ROW
+   =============================== */
+.task-input {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.task-input input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  font-size: 14px;
+}
+
+.task-input button {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  background: #2563eb;
+  color: white;
+  font-weight: 600;
+}
+
+.task-input button:hover {
+  background: #1d4ed8;
+}
+
+/* ===============================
+   TASK LIST (SCROLL INSIDE CARD)
+   =============================== */
+.task-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex: 1;                       /* 🔥 fills remaining space */
+  overflow-y: auto;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-top: 10px;
+}
+
+/* ===============================
+   TASK ITEM
+   =============================== */
+.task-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  font-size: 14px;
+}
+
+/* ===============================
+   COMPLETED TASK
+   =============================== */
+.task-list li.completed span {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+/* ===============================
+   CLEAN SCROLLBAR (MATCH IMAGE)
+   =============================== */
+.task-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.task-list::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
+/* ===============================
+   delete BUTTON
+   =============================== */
+.delete-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  color: #ef4444;
+}
+

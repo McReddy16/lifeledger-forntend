@@ -1,0 +1,101 @@
+/* ===== RESET ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ===== FULL BACKGROUND ===== */
+.signin-page {
+  min-height: 100vh;
+  background-image: url('../../public/IMG_20190202_152248.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+/* ===== DARK OVERLAY ===== */
+.signin-overlay {
+  min-height: 100vh;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== APP TITLE ===== */
+.app-title {
+  color: white;
+  font-size: 44px;
+  margin-bottom: 30px;
+  letter-spacing: 2px;
+}
+
+.app-title span {
+  color: orange;
+}
+
+/* ===== CARD ===== */
+.signin-card {
+  background:transparent;
+  width: 360px;
+  padding: 30px;
+  border-radius: 8px;
+  text-align: center;
+  /*box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);*/
+}
+
+/* ===== HEADING ===== */
+.signin-heading {
+  color: orange;
+  margin-bottom: 20px;
+  font-size: 22px;
+}
+
+/* ===== INPUTS ===== */
+.signin-input {
+  width: 100%;
+  padding: 11px;
+  margin-bottom: 16px;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+/* ===== ERROR ===== */
+.error-text {
+  color: red;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+/* ===== BUTTONS ===== */
+.btn-login {
+  width: 100%;
+  padding: 11px;
+  background: #0d6efd;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 12px;
+  font-size: 15px;
+}
+
+.btn-register {
+  width: 100%;
+  padding: 11px;
+  background: #0d6efd;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+/* ===== SMALL TEXT ===== */
+.new-user-text {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #555;
+}
