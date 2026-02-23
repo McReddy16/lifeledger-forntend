@@ -74,7 +74,7 @@ export async function updateAccountability(id) {
 }
 
 // =====================================================
-// 🗑️ SOFT DELETE A Accountability
+// 🗑️ SOFT DELETE A Accountability//
 // =====================================================
 export async function deleteAccountability(id) {
   const res = await fetch(`${BASE_URL}/${id}`, {
