@@ -84,3 +84,17 @@ export async function deleteAccountability(id) {
 
   return handleResponse(res);
 }
+// =====================================================
+// ✏️ EDIT REMINDER TASK TEXT
+// =====================================================
+export async function editAccountability(id, taskText) {
+  const res = await fetch(`${BASE_URL}/${id}`, {
+    method: "PUT",
+    headers: getAuthHeaders(),
+    body: JSON.stringify({
+      description: taskText,
+    }),
+  });
+
+  return handleResponse(res);
+}

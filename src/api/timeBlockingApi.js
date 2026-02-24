@@ -1,5 +1,5 @@
 // =====================================================
-// REMINDER SYSTEM – API CALLS
+// TIME BLOCKING SYSTEM – API CALLS
 // =====================================================
 
 const BASE_URL = "http://localhost:8080/api/timeBlocking";
@@ -8,7 +8,7 @@ const BASE_URL = "http://localhost:8080/api/timeBlocking";
 // SHARED RESPONSE HANDLER
 // =====================================================
 async function handleResponse(res) {
-  if (res.status === 204) return null; // DELETE case
+  if (res.status === 204) return null;
 
   const text = await res.text();
   const data = text ? JSON.parse(text) : null;
@@ -37,23 +37,35 @@ function getAuthHeaders() {
 }
 
 // =====================================================
-// CREATE A NEW TIME BLOCKING ITEM
+// ➕ CREATE TIME BLOCK
 // =====================================================
-export async function createTimeBlocking(payload) {
-  const res = await fetch(`${BASE_URL}`, {
+export async function createTimeBlocking({
+  description,
+  taskDate,
+  startTime,
+  endTaskDate,
+  endTime,
+}) {
+  const res = await fetch(BASE_URL, {
     method: "POST",
     headers: getAuthHeaders(),
-    body: JSON.stringify(payload),
+    body: JSON.stringify({
+      description,
+      taskDate,
+      startTime,
+      endTaskDate,
+      endTime,
+    }),
   });
 
   return handleResponse(res);
 }
 
 // =====================================================
-// 📥 FETCH ALL TIME BLOCKING ITEMS
+// 📥 FETCH ALL TIME BLOCKS
 // =====================================================
 export async function getTimeBlockingItems() {
-  const res = await fetch(`${BASE_URL}`, {
+  const res = await fetch(BASE_URL, {
     method: "GET",
     headers: getAuthHeaders(),
   });
@@ -62,9 +74,9 @@ export async function getTimeBlockingItems() {
 }
 
 // =====================================================
-// ✅ TOGGLE TIME BLOCKING ITEM COMPLETED STATUS
+// ✅ TOGGLE COMPLETED
 // =====================================================
-export async function updateTimeBlocking(id) {
+export async function toggleTimeBlocking(id) {
   const res = await fetch(`${BASE_URL}/${id}/toggle`, {
     method: "PUT",
     headers: getAuthHeaders(),
@@ -74,12 +86,37 @@ export async function updateTimeBlocking(id) {
 }
 
 // =====================================================
-// 🗑️ SOFT DELETE A TIME BLOCKING ITEM
+// 🗑️ DELETE TIME BLOCK
 // =====================================================
 export async function deleteTimeBlocking(id) {
   const res = await fetch(`${BASE_URL}/${id}`, {
     method: "DELETE",
     headers: getAuthHeaders(),
+  });
+
+  return handleResponse(res);
+}
+
+// =====================================================
+// ✏️ EDIT TIME BLOCK (FULL UPDATE REQUIRED)
+// =====================================================
+export async function editTimeBlocking(id, {
+  description,
+  taskDate,
+  startTime,
+  endTaskDate,
+  endTime,
+}) {
+  const res = await fetch(`${BASE_URL}/${id}`, {
+    method: "PUT",
+    headers: getAuthHeaders(),
+    body: JSON.stringify({
+      description,
+      taskDate,
+      startTime,
+      endTaskDate,
+      endTime,
+    }),
   });
 
   return handleResponse(res);

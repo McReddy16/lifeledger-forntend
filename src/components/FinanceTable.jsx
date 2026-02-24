@@ -1,185 +1,270 @@
 import { useState } from "react";
 import {
-  deleteJournalEntry,
-  updateJournalEntry,
-} from "../api/financeApi";
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TableSortLabel,
+  TablePagination,
+  Paper,
+  Box,
+  Typography,
+  Button,
+} from "@mui/material";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import { FaEdit, FaTrash, FaCheck, FaTimes } from "react-icons/fa";
+import { deleteJournalEntry, updateJournalEntry } from "../api/financeApi";
 
-/**
- * Format date from YYYY-MM-DD → DD-MM-YY
- */
+/* =========================
+   DATE FORMATTER
+   ========================= */
 function formatDate(dateStr) {
   if (!dateStr) return "";
-  const [year, month, day] = dateStr.split("-");
-  return `${day}-${month}-${year.slice(2)}`;
+  const [y, m, d] = dateStr.split("-");
+  return `${d}-${m}-${y}`;
 }
 
-export default function FinanceTable({ entries }) {
-  // Track which row is being edited
+/* ==================================================
+   FINANCE TABLE (UI ONLY)
+   - Sorting & pagination are BACKEND driven
+   ================================================== */
+export default function FinanceTable({
+  entries,
+  page,
+  rowsPerPage,
+  totalElements,
+  orderBy,
+  order,
+  loading,
+  onPageChange,
+  onRowsPerPageChange,
+  onSortChange,
+}) {
   const [editingId, setEditingId] = useState(null);
-
-  // Store editable description value
   const [editingDescription, setEditingDescription] = useState("");
 
-  /**
-   * Handle delete action (entire row)
-   */
+  /* DELETE */
   async function handleDelete(id) {
-    const ok = window.confirm("Delete this entry?");
-    if (!ok) return;
-
-    try {
-      await deleteJournalEntry(id);
-      window.location.reload(); // simple refresh for now
-    } catch (err) {
-      alert(err.message);
-    }
+    if (!window.confirm("Delete this entry?")) return;
+    await deleteJournalEntry(id);
+    window.location.reload(); // acceptable for now
   }
 
-  /**
-   * Enable inline edit for description
-   */
-  function handleEdit(entry) {
-    setEditingId(entry.id);
-    setEditingDescription(entry.description || "");
-  }
-
-  /**
-   * Save updated description
-   */
+  /* SAVE EDIT */
   async function handleSave(entry) {
-    try {
-      const payload = {
-        ...entry,
-        description: editingDescription,
-      };
-
-      await updateJournalEntry(entry.id, payload);
-
-      setEditingId(null);
-      setEditingDescription("");
-      window.location.reload(); // replace with state update later
-    } catch (err) {
-      alert(err.message);
-    }
-  }
-
-  /**
-   * Cancel inline edit
-   */
-  function handleCancel() {
+    await updateJournalEntry(entry.id, {
+      ...entry,
+      description: editingDescription,
+    });
     setEditingId(null);
-    setEditingDescription("");
+    window.location.reload();
   }
 
   return (
-    <div className="entries-card">
-      <h2 className="entries-title">Entries</h2>
+    <Paper sx={{ borderRadius: 3, overflow: "hidden" }}>
+      {/* =========================
+         HEADER BAR (Entries + Calculate)
+         ========================= */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          px: 2,
+          py: 1.5,
+          borderBottom: "1px solid #e5e7eb",
+        }}
+      >
+        <Typography fontSize={18} fontWeight={600}>
+          ENTRIES
+        </Typography>
 
-      <div className="table-wrapper">
-        <table className="entries-table">
-          <thead>
-            <tr>
-              <th>DATE</th>
-              <th>CATEGORY</th>
-              <th>DESCRIPTION</th>
-              <th>AMOUNT</th>
-              <th>FLOW</th>
-              <th>PAYMENT</th>
-              <th>ACTION</th>
-            </tr>
-          </thead>
+        
+      </Box>
 
-          <tbody>
-            {entries.length === 0 ? (
-              <tr>
-                <td colSpan="7" className="no-entries">
-                  No entries
-                </td>
-              </tr>
-            ) : (
-              entries.map((e) => (
-                <tr key={e.id}>
-                  {/* Date */}
-                  <td>{formatDate(e.entryDate)}</td>
+      {/* =========================
+         TABLE
+         ========================= */}
+      <TableContainer>
+        <Table size="small">
+          {/* ---------- HEADER ---------- */}
+          <TableHead>
+            <TableRow sx={{ backgroundColor: "#f1f5f9" }}>
+              {[
+                { key: "entryDate", label: "Date" },
+                { key: "category", label: "Category" },
+                { key: "description", label: "Description" },
+                { key: "amount", label: "Amount", align: "right" },
+                { key: "moneyFlow", label: "Flow", align: "center" },
+              ].map((col) => (
+                <TableCell
+                  key={col.key}
+                  align={col.align || "left"}
+                  sx={{
+                    fontWeight: 700,
+                    fontSize: 13,
+                    textTransform: "uppercase",
+                    borderRight: "1px solid #e5e7eb",
+                  }}
+                >
+                  <TableSortLabel
+                    active={orderBy === col.key}
+                    direction={orderBy === col.key ? order : "asc"}
+                    onClick={() => onSortChange(col.key)}
+                  >
+                    {col.label}
+                  </TableSortLabel>
+                </TableCell>
+              ))}
 
-                  {/* Category */}
-                  <td>{e.category}</td>
+              <TableCell
+                sx={{
+                  fontWeight: 700,
+                  fontSize: 13,
+                  borderRight: "1px solid #e5e7eb",
+                }}
+              >
+                Payment
+              </TableCell>
 
-                  {/* Description with inline editor */}
-                  <td>
-                    {editingId === e.id ? (
-                      <div className="inline-edit">
-                        <input
-                          type="text"
-                          value={editingDescription}
-                          onChange={(ev) =>
-                            setEditingDescription(ev.target.value)
-                          }
-                          className="inline-input"
-                        />
+              <TableCell align="center" sx={{ fontWeight: 700, fontSize: 13 }}>
+                Action
+              </TableCell>
+            </TableRow>
+          </TableHead>
 
-                        <span
-                          className="inline-icon save-icon"
-                          onClick={() => handleSave(e)}
-                          title="Save"
-                        >
-                          ✔
-                        </span>
+          {/* ---------- BODY ---------- */}
+          <TableBody>
+            {entries.map((e) => (
+              <TableRow key={e.id} hover>
+                {/* DATE */}
+                <TableCell sx={{ borderRight: "1px solid #e5e7eb" }}>
+                  {formatDate(e.entryDate)}
+                </TableCell>
 
-                        <span
-                          className="inline-icon cancel-icon"
-                          onClick={handleCancel}
-                          title="Cancel"
-                        >
-                          ✖
-                        </span>
-                      </div>
-                    ) : (
-                      <div className="desc-cell">{e.description}</div>
-                    )}
-                  </td>
+                {/* CATEGORY */}
+                <TableCell sx={{ borderRight: "1px solid #e5e7eb" }}>
+                  {e.category}
+                </TableCell>
 
-                  {/* Amount */}
-                  <td>{e.amount}</td>
+                {/* DESCRIPTION */}
+                <TableCell
+                  sx={{
+                    borderRight: "1px solid #e5e7eb",
+                    maxWidth: 260,
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {editingId === e.id ? (
+                    <>
+                      <input
+                        value={editingDescription}
+                        onChange={(ev) =>
+                          setEditingDescription(ev.target.value)
+                        }
+                        style={{ width: "65%" }}
+                      />
+                      <FaCheck
+                        style={{ marginLeft: 8, cursor: "pointer" }}
+                        onClick={() => handleSave(e)}
+                      />
+                      <FaTimes
+                        style={{ marginLeft: 6, cursor: "pointer" }}
+                        onClick={() => setEditingId(null)}
+                      />
+                    </>
+                  ) : (
+                    e.description
+                  )}
+                </TableCell>
 
-                  {/* Flow badge */}
-                  <td>
-                    <span
-                      className={`flow-badge ${
-                        e.moneyFlow === "IN" ? "flow-in" : "flow-out"
-                      }`}
-                    >
-                      {e.moneyFlow}
-                    </span>
-                  </td>
+                {/* AMOUNT */}
+                <TableCell
+                  align="right"
+                  sx={{
+                    fontWeight: 600,
+                    borderRight: "1px solid #e5e7eb",
+                  }}
+                >
+                  {e.amount}
+                </TableCell>
 
-                  {/* Payment type */}
-                  <td>{e.paymentType}</td>
+                {/* FLOW */}
+                <TableCell
+                  align="center"
+                  sx={{ borderRight: "1px solid #e5e7eb" }}
+                >
+                  <span
+                    style={{
+                      padding: "4px 14px",
+                      borderRadius: 999,
+                      fontWeight: 600,
+                      fontSize: 13,
+                      background:
+                        e.moneyFlow === "IN" ? "#dcfce7" : "#fee2e2",
+                      color:
+                        e.moneyFlow === "IN" ? "#166534" : "#991b1b",
+                    }}
+                  >
+                    {e.moneyFlow === "IN" ? "+" : "-"}
+                  </span>
+                </TableCell>
 
-                  {/* Hover actions */}
-                  <td className="action-cell">
-                    <span
-                      className="action-icon edit-icon"
-                      onClick={() => handleEdit(e)}
-                      title="Edit description"
-                    >
-                      ✏️
-                    </span>
+                {/* PAYMENT */}
+                <TableCell sx={{ borderRight: "1px solid #e5e7eb" }}>
+                  {e.paymentType}
+                </TableCell>
 
-                    <span
-                      className="action-icon delete-icon"
-                      onClick={() => handleDelete(e.id)}
-                      title="Delete entry"
-                    >
-                      🗑
-                    </span>
-                  </td>
-                </tr>
-              ))
+                {/* ACTION */}
+                <TableCell align="center">
+                  <FaEdit
+                    style={{
+                      color: "#2563eb",
+                      cursor: "pointer",
+                      marginRight: 10,
+                    }}
+                    onClick={() => {
+                      setEditingId(e.id);
+                      setEditingDescription(e.description);
+                    }}
+                  />
+                  <FaTrash
+                    style={{ color: "#dc2626", cursor: "pointer" }}
+                    onClick={() => handleDelete(e.id)}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+
+            {loading && (
+              <TableRow>
+                <TableCell colSpan={8} align="center">
+                  Loading…
+                </TableCell>
+              </TableRow>
             )}
-          </tbody>
-        </table>
-      </div>
-    </div>
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      {/* =========================
+         PAGINATION (BACKEND)
+         ========================= */}
+      <TablePagination
+        component="div"
+        count={totalElements}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        onPageChange={(_, p) => onPageChange(p)}
+        onRowsPerPageChange={(e) =>
+          onRowsPerPageChange(parseInt(e.target.value, 10))
+        }
+        rowsPerPageOptions={[5, 10, 25, 50]}
+      />
+    </Paper>
   );
 }

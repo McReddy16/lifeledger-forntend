@@ -1,17 +1,14 @@
 import { useEffect, useState } from "react";
-import {
-  getCategories,
-  getMoneyFlows,
-  getPaymentTypes,
-  addJournalEntry,
-} from "../api/financeApi";
+import { getJournalMeta, addJournalEntry } from "../api/financeApi"; 
+// ✅ FIXED: use addJournalEntry (not createJournalEntry)
+
 import "../styles/finance.css";
 
-/**
- * Empty form template
- */
+/* ===============================
+   INITIAL EMPTY FORM STATE
+================================= */
 const EMPTY_FORM = {
-  entryDate: "",
+  entryDate: "",      // yyyy-mm-dd (browser format)
   category: "",
   description: "",
   amount: "",
@@ -20,78 +17,115 @@ const EMPTY_FORM = {
 };
 
 export default function FinanceEntryForm({ onEntryAdded }) {
+  const [meta, setMeta] = useState(null);
+  const [selectedType, setSelectedType] = useState("");
+  const [selectedGroup, setSelectedGroup] = useState("");
   const [categories, setCategories] = useState([]);
-  const [moneyFlows, setMoneyFlows] = useState([]);
-  const [paymentTypes, setPaymentTypes] = useState([]);
   const [form, setForm] = useState(EMPTY_FORM);
+  const [submitting, setSubmitting] = useState(false);
 
-  /**
-   * Load dropdown values on component load
-   */
+  /* ===============================
+     LOAD META DATA (dropdown values)
+     GET /journal/meta
+  ================================= */
   useEffect(() => {
-    async function loadDropdowns() {
+    async function loadMeta() {
       try {
-        setCategories((await getCategories()) ?? []);
-        setMoneyFlows((await getMoneyFlows()) ?? []);
-        setPaymentTypes((await getPaymentTypes()) ?? []);
+        const data = await getJournalMeta();
+        setMeta(data);
       } catch (err) {
-        console.error("Dropdown API error:", err);
+        console.error("Meta load failed:", err);
       }
     }
-    loadDropdowns();
+
+    loadMeta();
   }, []);
 
-  /**
-   * Limit description to 30 words
-   */
-  function limitTo30Words(text) {
-    const words = text.trim().split(/\s+/);
-    return words.length <= 30 ? text : words.slice(0, 30).join(" ");
+  /* ===============================
+     HANDLE TRANSACTION TYPE CHANGE
+  ================================= */
+  function handleTypeChange(e) {
+    const type = e.target.value;
+
+    setSelectedType(type);
+    setSelectedGroup("");
+    setCategories([]);
+
+    // reset dependent fields
+    setForm((p) => ({
+      ...p,
+      category: "",
+      moneyFlow: "",
+    }));
+
+    if (!meta) return;
+
+    if (type === "INCOME") {
+      setCategories(meta.incomeCategories || []);
+      setForm((p) => ({ ...p, moneyFlow: "IN" })); // auto +
+    }
+
+    if (type === "EXPENSE") {
+      setForm((p) => ({ ...p, moneyFlow: "OUT" })); // auto -
+    }
+
+    if (type === "INVESTMENT") {
+      setCategories(meta.investmentCategories || []);
+    }
+
+    if (type === "OTHER") {
+      setCategories(["OTHER"]);
+    }
   }
 
-  /**
-   * Handle input changes
-   */
+  /* ===============================
+     HANDLE EXPENSE GROUP
+  ================================= */
+  function handleGroupChange(e) {
+    const group = e.target.value;
+
+    setSelectedGroup(group);
+
+    if (meta?.expenseCategories) {
+      setCategories(meta.expenseCategories[group] || []);
+    }
+
+    setForm((p) => ({ ...p, category: "" }));
+  }
+
+  /* ===============================
+     HANDLE INPUT CHANGE
+  ================================= */
   function handleChange(e) {
     const { name, value } = e.target;
 
-    if (!(name in form)) {
-      console.error("Invalid form field:", name);
-      return;
-    }
-
-    // Apply word limit only for description
+    // Limit description to 30 words
     if (name === "description") {
-      setForm((prev) => ({
-        ...prev,
-        description: limitTo30Words(value),
-      }));
+      const words = value.trim().split(/\s+/);
+      const limited =
+        words.length <= 30 ? value : words.slice(0, 30).join(" ");
+      setForm((p) => ({ ...p, description: limited }));
       return;
     }
 
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setForm((p) => ({ ...p, [name]: value }));
   }
 
-  /**
-   * Submit form data
-   */
+  /* ===============================
+     SUBMIT FORM
+  ================================= */
   async function handleSubmit() {
-    if (
-      !form.entryDate ||
-      !form.category ||
-      !form.amount ||
-      !form.moneyFlow ||
-      !form.paymentType
-    ) {
-      alert("Fill all required fields");
-      return;
-    }
+    if (!form.entryDate) return alert("Date required");
+    if (!selectedType) return alert("Transaction type required");
+    if (!form.category) return alert("Category required");
+    if (!form.amount || Number(form.amount) <= 0)
+      return alert("Amount must be > 0");
+    if (!form.moneyFlow) return alert("Select + or -");
+    if (!form.paymentType) return alert("Payment type required");
 
     const payload = {
-      entryDate: form.entryDate,
+      entryDate: form.entryDate, // yyyy-mm-dd (Spring Boot friendly)
+      transactionType: selectedType,
       category: form.category,
       description: form.description,
       amount: Number(form.amount),
@@ -99,10 +133,24 @@ export default function FinanceEntryForm({ onEntryAdded }) {
       paymentType: form.paymentType,
     };
 
-    await addJournalEntry(payload);
+    try {
+      setSubmitting(true);
 
-    setForm(EMPTY_FORM);
-    onEntryAdded && onEntryAdded();
+      await addJournalEntry(payload); // ✅ FIXED FUNCTION
+
+      // Reset everything after success
+      setForm(EMPTY_FORM);
+      setSelectedType("");
+      setSelectedGroup("");
+      setCategories([]);
+
+      if (onEntryAdded) onEntryAdded(); // refresh table
+
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -110,6 +158,8 @@ export default function FinanceEntryForm({ onEntryAdded }) {
       <h2 className="finance-title">FINANCE ENTRY</h2>
 
       <div className="finance-form">
+
+        {/* ================= DATE ================= */}
         <input
           type="date"
           name="entryDate"
@@ -117,27 +167,47 @@ export default function FinanceEntryForm({ onEntryAdded }) {
           onChange={handleChange}
         />
 
+        {/* ================= TYPE ================= */}
+        <select value={selectedType} onChange={handleTypeChange}>
+          <option value="">Select Type</option>
+          {meta?.transactionTypes?.map((t) => (
+            <option key={t} value={t}>{t}</option>
+          ))}
+        </select>
+
+        {/* ================= EXPENSE GROUP ================= */}
+        {selectedType === "EXPENSE" && (
+          <select value={selectedGroup} onChange={handleGroupChange}>
+            <option value="">Select Group</option>
+            {meta?.expenseGroups?.map((g) => (
+              <option key={g} value={g}>{g}</option>
+            ))}
+          </select>
+        )}
+
+        {/* ================= CATEGORY ================= */}
         <select
           name="category"
           value={form.category}
           onChange={handleChange}
+          disabled={!categories.length}
         >
-          <option value="">Category</option>
+          <option value="">Select Category</option>
           {categories.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
+            <option key={c} value={c}>{c}</option>
           ))}
         </select>
 
+        {/* ================= DESCRIPTION ================= */}
         <input
           type="text"
           name="description"
-          placeholder="Description (max 30 words)"
+          placeholder="Description"
           value={form.description}
           onChange={handleChange}
         />
 
+        {/* ================= AMOUNT ================= */}
         <input
           type="number"
           name="amount"
@@ -146,35 +216,44 @@ export default function FinanceEntryForm({ onEntryAdded }) {
           onChange={handleChange}
         />
 
-        <select
-          name="moneyFlow"
-          value={form.moneyFlow}
-          onChange={handleChange}
-        >
-          <option value="">IN / OUT</option>
-          {moneyFlows.map((f) => (
-            <option key={f} value={f}>
-              {f}
-            </option>
-          ))}
-        </select>
+        {/* ================= MONEY FLOW ================= */}
+        {selectedType === "INCOME" && (
+          <input type="text" value="+" readOnly />
+        )}
 
+        {selectedType === "EXPENSE" && (
+          <input type="text" value="-" readOnly />
+        )}
+
+        {(selectedType === "INVESTMENT" || selectedType === "OTHER") && (
+          <select
+            name="moneyFlow"
+            value={form.moneyFlow}
+            onChange={handleChange}
+          >
+            <option value="">Select Flow</option>
+            <option value="IN">+</option>
+            <option value="OUT">-</option>
+          </select>
+        )}
+
+        {/* ================= PAYMENT TYPE ================= */}
         <select
           name="paymentType"
           value={form.paymentType}
           onChange={handleChange}
         >
           <option value="">Payment</option>
-          {paymentTypes.map((p) => (
-            <option key={p} value={p}>
-              {p}
-            </option>
+          {meta?.paymentTypes?.map((p) => (
+            <option key={p} value={p}>{p}</option>
           ))}
         </select>
 
-        <button className="add-btn" onClick={handleSubmit}>
-          + Add
+        {/* ================= SUBMIT ================= */}
+        <button onClick={handleSubmit} disabled={submitting}>
+          {submitting ? "Adding..." : "+ Add"}
         </button>
+
       </div>
     </div>
   );

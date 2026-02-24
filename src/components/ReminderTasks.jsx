@@ -1,20 +1,25 @@
 import { useEffect, useState } from "react";
-import { FaTrash } from "react-icons/fa";
+import { FaTrash, FaRegEdit } from "react-icons/fa";
 import "../styles/tasks.css";
 
-// 🔗 API functions (BACKEND CONNECTED)
+// 🔗 API functions
 import {
   createReminder,
   getReminders,
   updateReminder,
   deleteReminder,
+  editReminder,
 } from "../api/reminderApi";
 
 const ReminderTasks = () => {
   const [tasks, setTasks] = useState([]);
   const [input, setInput] = useState("");
 
-  // LOAD REMINDERS FROM BACKEND
+  // Edit state
+  const [editingId, setEditingId] = useState(null);
+  const [editText, setEditText] = useState("");
+
+  // LOAD REMINDERS
   useEffect(() => {
     const loadReminders = async () => {
       try {
@@ -63,6 +68,24 @@ const ReminderTasks = () => {
     }
   };
 
+  // SAVE EDIT
+  const saveEdit = async (id) => {
+    if (!editText.trim()) return;
+
+    try {
+      const updated = await editReminder(id, editText);
+
+      setTasks((prev) =>
+        prev.map((t) => (t.id === id ? updated : t))
+      );
+
+      setEditingId(null);
+      setEditText("");
+    } catch (err) {
+      console.error("Edit failed", err);
+    }
+  };
+
   return (
     <div className="task-card">
       <h3>Reminder System</h3>
@@ -88,13 +111,42 @@ const ReminderTasks = () => {
               checked={task.completed}
               onChange={() => toggleTask(task.id)}
             />
-            <span>{task.taskText}</span>
-            <button
-              className="delete-btn"
-              onClick={() => removeTask(task.id)}
-            >
-              <FaTrash size={13} />
-            </button>
+
+            {editingId === task.id ? (
+              <input
+                type="text"
+                value={editText}
+                onChange={(e) => setEditText(e.target.value)}
+                onKeyDown={(e) =>
+                  e.key === "Enter" && saveEdit(task.id)
+                }
+                autoFocus
+              />
+            ) : (
+              <span>{task.taskText}</span>
+            )}
+
+            {/* ACTION ICONS */}
+            <div className="task-actions">
+              <button
+                className={`edit-btn ${
+                  editingId === task.id ? "active" : ""
+                }`}
+                onClick={() => {
+                  setEditingId(task.id);
+                  setEditText(task.taskText);
+                }}
+              >
+                <FaRegEdit size={14} />
+              </button>
+
+              <button
+                className="delete-btn"
+                onClick={() => removeTask(task.id)}
+              >
+                <FaTrash size={13} />
+              </button>
+            </div>
           </li>
         ))}
       </ul>

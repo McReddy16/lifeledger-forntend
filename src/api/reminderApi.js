@@ -82,5 +82,22 @@ export async function deleteReminder(id) {
     headers: getAuthHeaders(),
   });
 
+  
+
+  return handleResponse(res);
+}
+
+// =====================================================
+// ✏️ EDIT REMINDER TASK TEXT
+// =====================================================
+export async function editReminder(id, taskText) {
+  const res = await fetch(`${BASE_URL}/${id}`, {
+    method: "PUT",
+    headers: getAuthHeaders(),
+    body: JSON.stringify({
+      description: taskText,
+    }),
+  });
+
   return handleResponse(res);
 }

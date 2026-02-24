@@ -84,3 +84,18 @@ export async function deleteTracking(id) {
 
   return handleResponse(res);
 }
+// =====================================================
+// ✏️ EDIT TRACKING TEXT
+// =====================================================
+export async function editTracking(id, taskText) {
+  const res = await fetch(`${BASE_URL}/${id}`, {
+    method: "PUT",
+    headers: getAuthHeaders(),
+    body: JSON.stringify({
+      description: taskText,
+    }),
+  });
+
+  return handleResponse(res);
+}
+

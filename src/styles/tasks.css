@@ -125,15 +125,132 @@
 /* ===============================
    delete BUTTON
    =============================== */
+
 .delete-btn {
   margin-left: auto;
+  background: transparent !important;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  color: #ffffff;     /* white by default */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-btn:hover {
+  color: #ef4444;     /* red on hover */
+  background: transparent !important;
+}
+
+
+/* ===============================
+   TASK ACTION ICONS
+   =============================== */
+.task-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ===============================
+   EDIT BUTTON
+   =============================== */
+.edit-btn {
   background: none;
   border: none;
   color: #94a3b8;
   cursor: pointer;
+  padding: 2px;
 }
 
-.delete-btn:hover {
-  color: #ef4444;
+.edit-btn:hover {
+  color: #38bdf8;
+}
+
+/* ACTIVE EDIT STATE */
+.edit-btn.active {
+  color: #2563eb;
+}
+
+/* ===============================
+   EDIT INPUT STYLE
+   =============================== */
+.task-list input[type="text"] {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #2563eb;
+  color: #e5e7eb;
+  outline: none;
+  padding: 2px 4px;
+  font-size: 14px;
+}
+
+/*------------------------------------------------------------------------------------------------------------*/
+/* ===============================
+   DATETIME SECTION
+   =============================== */
+.datetime-section {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.datetime-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.datetime-block label {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.datetime-block input {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  font-size: 13px;
+}
+
+/* ===============================
+   SINGLE ADD BUTTON CENTERED
+   =============================== */
+.add-btn-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.add-btn-wrapper button {
+  padding: 8px 20px;
+  border-radius: 12px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.add-btn-wrapper button:hover {
+  background: #1d4ed8;
+}
+
+/* ===============================
+   TASK CONTENT
+   =============================== */
+.task-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.task-title {
+  font-weight: 600;
 }
 
