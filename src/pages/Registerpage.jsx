@@ -1,10 +1,12 @@
 import { useState, useRef } from "react";
 import { signupUser } from "../api/authenticationApi";
+import { Link, useNavigate } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import "../styles/register.css";
-import { Link, useNavigate } from "react-router-dom"; // ✅ UPDATED
 
-export default function Register() { // ❌ removed goToLogin prop
-  const navigate = useNavigate(); // ✅ ADDED
+export default function Register() {
+  const navigate = useNavigate();
+  const emailRef = useRef(null);
 
   const [form, setForm] = useState({
     name: "",
@@ -13,7 +15,7 @@ export default function Register() { // ❌ removed goToLogin prop
   });
 
   const [error, setError] = useState("");
-  const emailRef = useRef(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const isValidGmail = (email) =>
     /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(email);
@@ -22,6 +24,11 @@ export default function Register() { // ❌ removed goToLogin prop
     /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
   async function handleRegister() {
+    if (!form.name.trim()) {
+      setError("Enter your full name");
+      return;
+    }
+
     if (!isValidGmail(form.email)) {
       setError("Enter a valid Gmail address");
       emailRef.current?.focus();
@@ -47,86 +54,79 @@ export default function Register() { // ❌ removed goToLogin prop
       });
 
       alert("Account created successfully. Please login.");
-
-      navigate("/login"); // ✅ UPDATED (replaces goToLogin())
+      navigate("/login");
     } catch (err) {
       if (err.message?.toLowerCase().includes("already")) {
         setError("Email already registered. Please login.");
         emailRef.current?.focus();
       } else {
-        setError(err.message || "Unable to create account. Please try again.");
+        setError("Unable to create account. Please try again.");
       }
     }
   }
 
   return (
     <div className="register-page">
-      <div className="register-overlay">
-        <h1 className="register-title">
-          Life <span>Ledger</span>
-        </h1>
+
+      {/* LEFT IMAGE */}
+      <div className="register-left"></div>
+
+      {/* RIGHT SIDE */}
+      <div className="register-right">
 
         <div className="register-card">
+
+          {/* Title moved inside card */}
+          <h1 className="card-title">Life Ledger</h1>
+
           <h2 className="register-heading">Create Account</h2>
 
           {error && <p className="error-text">{error}</p>}
 
           <input
             type="text"
-            placeholder="Full name"
+            placeholder="Full Name"
+            value={form.name}
             onChange={(e) =>
               setForm({ ...form, name: e.target.value })
             }
           />
 
-          <div className="input-wrapper">
-            <input
-              ref={emailRef}
-              type="email"
-              placeholder="Email address"
-              className={
-                error && error.toLowerCase().includes("email")
-                  ? "input-error"
-                  : ""
-              }
-              onChange={(e) => {
-                setForm({ ...form, email: e.target.value });
-                setError("");
-              }}
-            />
-            {error && error.toLowerCase().includes("email") && (
-              <span className="error-icon">!</span>
-            )}
-          </div>
+          <input
+            ref={emailRef}
+            type="email"
+            placeholder="Email Address"
+            value={form.email}
+            onChange={(e) =>
+              setForm({ ...form, email: e.target.value })
+            }
+          />
 
-          <div className="input-wrapper">
+          <div className="password-wrapper">
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="Password"
-              className={
-                error &&
-                (error.toLowerCase().includes("password") ||
-                  error.toLowerCase().includes("character"))
-                  ? "input-error"
-                  : ""
-              }
+              value={form.password}
               onChange={(e) =>
                 setForm({ ...form, password: e.target.value })
               }
             />
-            {error &&
-              (error.toLowerCase().includes("password") ||
-                error.toLowerCase().includes("character")) && (
-                <span className="error-icon">!</span>
-              )}
+            <span
+              className="toggle-password"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
           </div>
 
           <button onClick={handleRegister}>Register</button>
 
-          <Link to="/login" className="switch">
+          <Link to="/login" className="switch-link">
             Already have an account? Login
           </Link>
+
         </div>
+
       </div>
     </div>
   );

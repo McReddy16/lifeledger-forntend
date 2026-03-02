@@ -1,101 +1,214 @@
-/* ===== RESET ===== */
+/* ===========================
+   GLOBAL RESET
+   =========================== */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  font-family: "Segoe UI", sans-serif;
 }
 
-/* ===== FULL BACKGROUND ===== */
+/* ===========================
+   MAIN PAGE LAYOUT
+   Split screen layout
+   =========================== */
 .signin-page {
-  min-height: 100vh;
-  background-image: url('../../public/IMG_20190202_152248.jpg');
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  background: #ffffff;
+}
+
+/* ===========================
+   LEFT SIDE IMAGE
+   =========================== */
+.signin-left {
+  flex: 1.2; /* slightly larger image area */
+  background-image: url("/login-page.png");
   background-size: cover;
   background-position: center;
+  position: relative;
 }
 
-/* ===== DARK OVERLAY ===== */
-.signin-overlay {
-  min-height: 100vh;
-  background: rgba(0, 0, 0, 0.65);
+/* Smooth fade into white side */
+.signin-left::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 200px;
+  background: linear-gradient(
+    to right,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,1) 100%
+  );
+}
+
+/* ===========================
+   RIGHT SIDE CONTAINER
+   =========================== */
+.signin-right {
+  flex: 1;
+  background: #ffffff;
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  padding: 60px; /* increased padding */
 }
 
-/* ===== APP TITLE ===== */
-.app-title {
-  color: white;
-  font-size: 44px;
-  margin-bottom: 30px;
-  letter-spacing: 2px;
-}
-
-.app-title span {
-  color: orange;
-}
-
-/* ===== CARD ===== */
+/* ===========================
+   LOGIN CARD (BIGGER)
+   =========================== */
 .signin-card {
-  background:transparent;
-  width: 360px;
-  padding: 30px;
-  border-radius: 8px;
+  width: 500px; /* increased width */
+  padding: 55px 50px; /* more internal spacing */
+  border-radius: 25px;
+  background: #ffffff;
+
+  /* Soft layered shadow for premium feel */
+  box-shadow:
+    0 25px 50px rgba(0, 0, 0, 0.08),
+    0 10px 25px rgba(0, 0, 0, 0.05);
+
   text-align: center;
-  /*box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);*/
+  transition: 0.3s ease;
 }
 
-/* ===== HEADING ===== */
+/* Slight lift effect */
+.signin-card:hover {
+  transform: translateY(-6px);
+}
+
+/* ===========================
+   LIFE LEDGER TITLE (INSIDE CARD)
+   =========================== */
+.card-title {
+  font-size: 38px;
+  letter-spacing: 2px;
+  margin-bottom: 35px;
+  color: #2c5887;
+}
+
+/* ===========================
+   LOGIN HEADING
+   =========================== */
 .signin-heading {
-  color: orange;
-  margin-bottom: 20px;
-  font-size: 22px;
+  font-size: 20px;
+  margin-bottom: 30px;
+  color: #222;
+  font-weight: 600;
 }
 
-/* ===== INPUTS ===== */
+/* ===========================
+   INPUT FIELDS
+   =========================== */
 .signin-input {
   width: 100%;
-  padding: 11px;
-  margin-bottom: 16px;
-  border: 1px solid #aaa;
-  border-radius: 4px;
-  font-size: 14px;
+  padding: 16px; /* bigger inputs */
+  margin-bottom: 25px;
+  border-radius: 12px;
+  border: 1px solid #e5e5e5;
+  font-size: 15px;
+  background: #f7f9fc;
+  outline: none;
+  transition: 0.3s ease;
 }
 
-/* ===== ERROR ===== */
-.error-text {
-  color: red;
-  font-size: 14px;
-  margin-bottom: 10px;
+/* Focus effect */
+.signin-input:focus {
+  border-color: #2c5887;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(44, 88, 135, 0.15);
 }
 
-/* ===== BUTTONS ===== */
+/* ===========================
+   PASSWORD WRAPPER
+   =========================== */
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper input {
+  padding-right: 50px;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 16px;
+  top: 38%;
+  cursor: pointer;
+  color: #444;
+}
+
+/* ===========================
+   LOGIN BUTTON
+   =========================== */
 .btn-login {
   width: 100%;
-  padding: 11px;
-  background: #0d6efd;
-  color: white;
+  padding: 16px;
+  border-radius: 12px;
   border: none;
-  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
-  margin-bottom: 12px;
-  font-size: 15px;
+
+  background: #2c5887;
+  color: #ffffff;
+
+  transition: 0.3s ease;
 }
 
-.btn-register {
-  width: 100%;
-  padding: 11px;
-  background: #0d6efd;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 15px;
+/* Hover animation */
+.btn-login:hover {
+  background: #244a70;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(44, 88, 135, 0.25);
 }
 
-/* ===== SMALL TEXT ===== */
-.new-user-text {
-  margin-top: 12px;
+/* ===========================
+   REGISTER LINK
+   =========================== */
+.switch-link {
+  display: block;
+  margin-top: 25px;
   font-size: 14px;
   color: #555;
+  text-decoration: none;
+}
+
+.switch-link:hover {
+  color: #000;
+  text-decoration: underline;
+}
+
+/* ===========================
+   ERROR TEXT
+   =========================== */
+.error-text {
+  color: #e63946;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+/* ===========================
+   RESPONSIVE DESIGN
+   =========================== */
+@media (max-width: 900px) {
+  .signin-page {
+    flex-direction: column;
+  }
+
+  .signin-left {
+    height: 40vh;
+  }
+
+  .signin-right {
+    height: 60vh;
+    padding: 30px;
+  }
+
+  .signin-card {
+    width: 100%;
+  }
 }

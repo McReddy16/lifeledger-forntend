@@ -1,4 +1,4 @@
-/* ===============================
+/* /* ===============================
    GENERAL CALENDAR STYLE
 ================================ */
 
@@ -48,8 +48,4 @@
   border-radius: 6px !important;
   padding: 4px !important;
 }
-
-/* Smooth slot labels */
-.fc .fc-timegrid-slot-label {
-  font-weight: 500;
-}
+ */

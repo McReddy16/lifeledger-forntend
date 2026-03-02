@@ -25,15 +25,21 @@ const TimeBlockingTasks = () => {
     loadTasks();
   }, []);
 
-  const loadTasks = async () => {
-    try {
-      const data = await getTimeBlockingItems();
-      setTasks(data);
-    } catch (err) {
-      console.error("Load failed", err);
-    }
-  };
+ const loadTasks = async () => {
+  try {
+    const data = await getTimeBlockingItems();
 
+    const sorted = data.sort(
+      (a, b) =>
+        new Date(`${a.taskDate}T${a.startTime}`) -
+        new Date(`${b.taskDate}T${b.startTime}`)
+    ); // ascending by date + time
+
+    setTasks(sorted);
+  } catch (err) {
+    console.error("Load failed", err);
+  }
+};
   // =========================
   // CREATE
   // =========================
@@ -54,7 +60,15 @@ const TimeBlockingTasks = () => {
         endTime,
       });
 
-      setTasks((prev) => [...prev, saved]);
+     setTasks((prev) => {
+  const updated = [...prev, saved];
+
+  return updated.sort(
+    (a, b) =>
+      new Date(`${a.taskDate}T${a.startTime}`) -
+      new Date(`${b.taskDate}T${b.startTime}`)
+  ); // keep ascending after add
+});
 
       setDescription("");
       setStartDateTime("");

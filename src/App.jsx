@@ -7,6 +7,7 @@ import DashboardHome from "./pages/DashboardHome";
 import Tasks from "./pages/Task";
 import Finance from "./pages/Finance";  
 import Calendar from "./components/Calendar";
+import Performance from "./pages/Performance";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path="tasks" element={<Tasks />} />
           <Route path="finance" element={<Finance />} />
           <Route path="calendar" element={<Calendar />} />
+          <Route path="performance" element={<Performance />} />
         </Route>
       </Routes>
     </BrowserRouter>

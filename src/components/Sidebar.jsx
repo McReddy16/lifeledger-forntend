@@ -1,46 +1,120 @@
+import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import {
-  FaHome,
+  FaLayerGroup,
   FaTasks,
   FaChartLine,
   FaWallet,
   FaCalendarAlt,
+  FaBars,
 } from "react-icons/fa";
 import "../styles/dashboard.css";
 
 const Sidebar = () => {
+  const [collapsed, setCollapsed] = useState(false); // desktop collapse state
+  const [mobileOpen, setMobileOpen] = useState(false); // mobile slide state
+
+  // auto-close mobile sidebar when resizing to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 900) {
+        setMobileOpen(false);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // toggle logic (mobile slide OR desktop collapse)
+  const handleToggle = () => {
+    if (window.innerWidth < 900) {
+      setMobileOpen((prev) => !prev); // mobile slide toggle
+    } else {
+      setCollapsed((prev) => !prev); // desktop collapse toggle
+    }
+  };
+
   return (
-    <aside className="sidebar">
-      <div className="sidebar-logo">Life Ledger</div>
+    <>
+      {/* overlay only for mobile mode */}
+      {mobileOpen && (
+        <div
+          className="sidebar-overlay"
+          onClick={() => setMobileOpen(false)} // close when clicking outside
+        />
+      )}
 
-      <nav className="sidebar-nav">
-        <NavLink to="/dashboard" className="nav-item">
-          <FaHome />
-          <span>Dashboard</span>
-        </NavLink>
+      <aside
+        className={`sidebar 
+          ${collapsed ? "collapsed" : ""} 
+          ${mobileOpen ? "mobile-open" : ""}`}
+      >
+        {/* header section */}
+        <div className="sidebar-header">
+          {/* hide logo when collapsed */}
+          {!collapsed && (
+            <div className="sidebar-logo">Life Ledger</div>
+          )}
 
-        <NavLink to="/tasks" className="nav-item">
-          <FaTasks />
-          <span>Tasks</span>
-        </NavLink>
+          {/* horizontal hamburger button */}
+          <button
+            className="hamburger-btn" // removed rotate class
+            onClick={handleToggle}
+          >
+            <FaBars />
+          </button>
+        </div>
 
-        <NavLink to="/calendar" className="nav-item">
-          <FaCalendarAlt />
-          <span>Calendar</span>
-        </NavLink>
-
-        <NavLink to="/performance" className="nav-item">
-          <FaChartLine />
-          <span>Performance</span>
-        </NavLink>
-
-        <NavLink to="/finance" className="nav-item">
-          <FaWallet />
-          <span>Finance</span>
-        </NavLink>
-      </nav>
-    </aside>
+        {/* navigation items */}
+        <nav className="sidebar-nav">
+         <NavItem
+  to="/dashboard"
+  icon={<FaLayerGroup />}
+  label="Foundation"
+  collapsed={collapsed}
+/>
+          <NavItem
+            to="/tasks"
+            icon={<FaTasks />}
+            label="Tasks"
+            collapsed={collapsed}
+          />
+          <NavItem
+            to="/calendar"
+            icon={<FaCalendarAlt />}
+            label="Calendar"
+            collapsed={collapsed}
+          />
+          <NavItem
+            to="/performance"
+            icon={<FaChartLine />}
+            label="Performance"
+            collapsed={collapsed}
+          />
+          <NavItem
+            to="/finance"
+            icon={<FaWallet />}
+            label="Finance"
+            collapsed={collapsed}
+          />
+        </nav>
+      </aside>
+    </>
   );
 };
+
+// single navigation item component
+const NavItem = ({ to, icon, label, collapsed }) => (
+  <NavLink to={to} className="nav-item">
+    <div className="icon-wrapper">
+      {icon}
+      {/* show tooltip only in collapsed mode */}
+      {collapsed && <div className="tooltip">{label}</div>}
+    </div>
+
+    {/* hide label when collapsed */}
+    {!collapsed && <span>{label}</span>}
+  </NavLink>
+);
 
 export default Sidebar;

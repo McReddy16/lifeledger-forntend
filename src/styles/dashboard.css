@@ -1,27 +1,89 @@
-/* Layout */
+/* ===============================
+   LAYOUT
+================================ */
 .layout {
   display: flex;
   height: 100vh;
-  background: #f4f6fa;
-  
-
+  background: #f4f6fa; /* main background */
 }
 
-/* Sidebar */
+/* ===============================
+   SIDEBAR
+================================ */
 .sidebar {
-  width: 240px;
-  background: #0b1c2d;
+  width: 240px; /* default width */
+  background: #0b1c2d; /* dark navy */
   color: #fff;
   padding: 20px;
-  flex-shrink: 0; /* 🔒 sidebar NEVER shrinks */
+  flex-shrink: 0; /* prevent shrinking */
+  transition: width 0.3s ease, transform 0.3s ease; /* smooth collapse */
 }
 
+/* collapsed sidebar */
+.sidebar.collapsed {
+  width: 70px; /* compact mode */
+  padding: 20px 10px;
+}
+
+/* sidebar logo */
 .sidebar-logo {
   font-size: 20px;
   font-weight: 600;
   margin-bottom: 40px;
 }
 
+/* ===============================
+   SIDEBAR HEADER
+================================ */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* logo left, button right */
+  margin-bottom: 30px;
+}
+
+/* modern square hamburger button */
+.hamburger-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px; /* smooth modern corners */
+  border: none;
+  background: rgba(255, 255, 255, 0.08); /* subtle glass */
+  display: flex;
+  align-items: center;
+  justify-content: center; /* center icon */
+  cursor: pointer;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(6px); /* soft glass effect */
+}
+
+/* hamburger icon size */
+.hamburger-btn svg {
+  font-size: 20px;
+  color: #ffffff;
+  transition: transform 0.3s ease;
+}
+
+/* hover animation */
+.hamburger-btn:hover {
+  background: rgba(255, 255, 255, 0.18); /* brighter */
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25); /* soft shadow */
+  transform: scale(1.05); /* smooth enlarge */
+}
+
+/* click feedback */
+.hamburger-btn:active {
+  transform: scale(0.95);
+}
+
+/* rotate icon when collapsed */
+.hamburger-btn.rotate svg {
+  transform: rotate(90deg);
+}
+
+/* ===============================
+   NAVIGATION
+================================ */
 .sidebar-nav .nav-item {
   display: flex;
   align-items: center;
@@ -30,24 +92,103 @@
   margin-bottom: 8px;
   color: #cfd8e3;
   text-decoration: none;
-  border-radius: 8px;
+  border-radius: 10px;
+  transition: all 0.2s ease;
 }
 
-.sidebar-nav .nav-item:hover,
-.sidebar-nav .nav-item.active {
-  background: #1e3a5f;
+/* hover state */
+.sidebar-nav .nav-item:hover {
+  background: rgba(255, 255, 255, 0.08);
   color: #fff;
 }
 
-/* Main */
+/* active state */
+.sidebar-nav .nav-item.active {
+  background: linear-gradient(135deg, #1e3a5f, #274c77); /* premium highlight */
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
+  color: #fff;
+}
+
+/* ===============================
+   COLLAPSED BEHAVIOR
+================================ */
+
+/* hide labels when collapsed */
+.sidebar.collapsed .nav-item span {
+  display: none;
+}
+
+/* center icons when collapsed */
+.sidebar.collapsed .nav-item {
+  justify-content: center;
+}
+
+/* icon wrapper */
+.icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* tooltip (only when collapsed) */
+.tooltip {
+  position: absolute;
+  left: 50px;
+  background: #111;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+/* show tooltip on hover in collapsed mode */
+.sidebar.collapsed .icon-wrapper:hover .tooltip {
+  opacity: 1;
+}
+
+/* ===============================
+   MOBILE BEHAVIOR
+================================ */
+
+/* dark overlay behind sidebar */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 999;
+}
+
+/* mobile slide */
+@media (max-width: 900px) {
+  .sidebar {
+    position: fixed;
+    height: 100vh;
+    z-index: 1000;
+    transform: translateX(-100%); /* hidden by default */
+  }
+
+  .sidebar.mobile-open {
+    transform: translateX(0); /* slide in */
+  }
+}
+
+/* ===============================
+   MAIN CONTENT
+================================ */
 .main {
   flex: 1;
   display: flex;
   flex-direction: column;
-  
 }
 
-/* Topbar */
+/* ===============================
+   TOPBAR
+================================ */
 .topbar {
   height: 60px;
   background: #fff;
@@ -56,7 +197,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
-  flex-shrink: 0; /* 🔒 topbar NEVER shrinks */
+  flex-shrink: 0;
 }
 
 .topbar-title {
@@ -64,6 +205,7 @@
   font-weight: 600;
 }
 
+/* profile section */
 .profile-wrapper {
   display: flex;
   align-items: center;
@@ -71,6 +213,7 @@
   position: relative;
 }
 
+/* avatar circle */
 .avatar {
   width: 36px;
   height: 36px;
@@ -84,7 +227,7 @@
   cursor: pointer;
 }
 
-
+/* dropdown menu */
 .profile-menu {
   position: absolute;
   top: 48px;
@@ -98,7 +241,7 @@
 
 .profile-menu button {
   width: 100%;
-  padding: 10px 16px;
+  padding: 10px 20px;
   border: none;
   background: none;
   text-align: left;
@@ -113,7 +256,9 @@
   color: #d32f2f;
 }
 
-/* Dashboard Content */
+/* ===============================
+   DASHBOARD CONTENT
+================================ */
 .dashboard-content {
   padding: 24px;
 }
@@ -135,4 +280,138 @@
 .highlight {
   background: linear-gradient(135deg, #1e3a5f, #274c77);
   color: #fff;
+}
+
+.hero {
+  text-align: center;
+  padding: 30px;
+}
+
+.hero h2 {
+  font-size: 26px;
+  margin-bottom: 10px;
+}
+
+.vision {
+  margin-top: 20px;
+  text-align: center;
+  background: #f0f4f9;
+}
+
+.vision h3 {
+  margin-bottom: 10px;
+}
+/* ===============================
+   HOME WRAPPER
+================================ */
+
+.home-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* ===============================
+   HERO SECTION
+================================ */
+
+.hero-section {
+  text-align: center;
+  padding: 60px 20px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #1e3a5f, #274c77);
+  color: #fff;
+}
+
+.hero-section h1 {
+  font-size: 36px;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+.tagline {
+  font-size: 18px;
+  opacity: 0.9;
+  margin-bottom: 8px;
+}
+
+.sub-text {
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+/* ===============================
+   PHILOSOPHY GRID
+================================ */
+
+.philosophy-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+}
+
+.philosophy-card {
+  background: #ffffff;
+  padding: 28px;
+  border-radius: 14px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.philosophy-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+}
+
+.philosophy-card h3 {
+  margin-bottom: 12px;
+  font-size: 18px;
+}
+
+/* ===============================
+   IMPACT SECTION
+================================ */
+
+.impact-section {
+  display: flex;
+  gap: 20px;
+}
+
+.impact-box {
+  flex: 1;
+  background: #f0f4fa;
+  padding: 25px;
+  border-radius: 14px;
+  text-align: center;
+}
+
+.impact-box h4 {
+  margin-bottom: 10px;
+}
+
+/* ===============================
+   VISION SECTION
+================================ */
+
+.vision-section {
+  text-align: center;
+  padding: 40px 20px;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.vision-section h2 {
+  margin-bottom: 12px;
+}
+/* ===============================
+   COPYRIGHT FOOTER
+================================ */
+.home-footer {
+  margin-top: 60px;
+  padding: 25px 10px;
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+  border-top: 1px solid #e4e7ec;
 }

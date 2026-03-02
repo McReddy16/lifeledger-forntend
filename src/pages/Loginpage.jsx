@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { useNavigate,Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { loginUser } from "../api/authenticationApi";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import "../styles/login.css";
 
 export default function Login({ onLoginSuccess }) {
@@ -12,6 +13,7 @@ export default function Login({ onLoginSuccess }) {
   });
 
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   function handleChange(e) {
     setForm({
@@ -26,31 +28,34 @@ export default function Login({ onLoginSuccess }) {
     try {
       const response = await loginUser(form);
 
-      // ✅ STORE AUTH DATA 
       localStorage.setItem("authToken", response.token);
       localStorage.setItem("userEmail", response.email);
       localStorage.setItem("userName", response.username);
 
-      // Optional callback
       if (onLoginSuccess) {
         onLoginSuccess(response);
       }
 
-      // ✅ Navigate after successful login
       navigate("/dashboard");
-    } catch (err) {
+    } catch {
       setError("Invalid email or password");
     }
   }
 
   return (
     <div className="signin-page">
-      <div className="signin-overlay">
-        <h1 className="app-title">
-          Life <span>Ledger</span>
-        </h1>
+
+      {/* LEFT SIDE - IMAGE */}
+      <div className="signin-left"></div>
+
+      {/* RIGHT SIDE - FORM */}
+      <div className="signin-right">
 
         <div className="signin-card">
+
+          {/* Title moved inside card */}
+          <h1 className="card-title">LIFE LEDGER</h1>
+
           <h2 className="signin-heading">LOGIN</h2>
 
           {error && <p className="error-text">{error}</p>}
@@ -64,23 +69,33 @@ export default function Login({ onLoginSuccess }) {
             onChange={handleChange}
           />
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            className="signin-input"
-            value={form.password}
-            onChange={handleChange}
-          />
+          <div className="password-wrapper">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Password"
+              className="signin-input"
+              value={form.password}
+              onChange={handleChange}
+            />
+            <span
+              className="toggle-password"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
+          </div>
 
           <button className="btn-login" onClick={handleLogin}>
             Login
           </button>
 
-          <Link to="/register" className="switch">
+          <Link to="/register" className="switch-link">
             Don't have an account? Register
           </Link>
+
         </div>
+
       </div>
     </div>
   );

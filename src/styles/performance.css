@@ -1,0 +1,70 @@
+.performance-container {
+  height: calc(100vh - 70px);
+  padding: 15px 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Title */
+.performance-title {
+  margin-bottom: 12px;
+  font-size: 22px;
+}
+
+/* Top Cards Layout */
+.performance-top {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+/* ================================
+   CONSTANT DARK NAVY CARDS
+================================ */
+.task-card1 {
+  padding: 16px;
+  border-radius: 12px;
+  background-color: #ffff;
+  color: #0b1c2d;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Title */
+.task-card1 h3 {
+  font-size: 18px;
+  margin-bottom: 6px;
+}
+
+/* Stats */
+.task-card1 p {
+  margin: 4px 0;
+  font-size: 15px;
+}
+
+/* Divider */
+.task-card1 hr {
+  margin: 8px 0;
+  border: none;
+  height: 1px;
+  background-color: rgba(255,255,255,0.4);
+}
+
+/* Motivation */
+.motivation {
+  font-size: 13px;
+  font-style: italic;
+}
+
+/* Bottom Section */
+.performance-bottom {
+  flex: 1;
+  background: white;
+  border-radius: 14px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+}

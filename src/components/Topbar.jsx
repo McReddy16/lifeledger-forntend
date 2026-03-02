@@ -22,15 +22,15 @@ const Topbar = ({ userName }) => {
   const getTitle = () => {
     switch (location.pathname) {
       case "/dashboard":
-        return "Dashboard";
+        return "FOUNDATION";
       case "/tasks":
-        return "Tasks";
+        return "TASKS";
       case "/calendar":
-        return "Calendar";
+        return "CALENDAR";
       case "/performance":
-        return "Performance";
+        return "PERFORMANCE";
       case "/finance":
-        return "My Finance";
+        return "MY FINANCE";
       default:
         return "";
     }
@@ -73,14 +73,14 @@ const Topbar = ({ userName }) => {
 
         {open && (
           <div className="profile-menu">
-            <button
+            {/* <button
               onClick={() => {
                 setOpen(false);
                 navigate("/profile");
               }}
             >
               Profile
-            </button>
+            </button> */}
 
             <button
               className="logout"

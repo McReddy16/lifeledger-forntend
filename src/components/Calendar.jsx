@@ -31,24 +31,35 @@ export default function Calendar() {
      ========================= */
   const loadEvents = useCallback(async () => {
     try {
-      const response = await getTimeBlockingItems();
+      const data = await getTimeBlockingItems(); // <-- already array
 
-      const formatted = response.data.map((item) => ({
-        id: item.id.toString(),
-        title: item.title,
-        start: item.startTime,
-        end: item.endTime,
-        backgroundColor: "#6264A7",
-        borderColor: "#6264A7",
-        textColor: "#ffffff",
-        extendedProps: {
-          description: item.description,
-        },
-      }));
+      if (!Array.isArray(data)) {
+        console.error("Expected array but got:", data);
+        setEvents([]);
+        return;
+      }
+
+      const formatted = data.map((item) => {
+        const start = new Date(`${item.taskDate}T${item.startTime}`);
+        const end = new Date(`${item.endTaskDate}T${item.endTime}`);
+
+        return {
+          id: item.id.toString(),
+          title: item.taskText,
+          start,
+          end,
+          backgroundColor: "#6264A7",
+          borderColor: "#6264A7",
+          textColor: "#ffffff",
+        };
+      });
+
+      console.log("FINAL EVENTS:", formatted);
 
       setEvents(formatted);
     } catch (error) {
       console.error("Load failed:", error);
+      setEvents([]);
     }
   }, []);
 
@@ -57,52 +68,31 @@ export default function Calendar() {
   }, [loadEvents]);
 
   /* =========================
-     CUSTOM EVENT RENDER
+     EVENT DISPLAY
      ========================= */
-  const renderEventContent = (eventInfo) => {
-    return (
-      <Tooltip
-        title={
-          <>
-            <div><strong>{eventInfo.event.title}</strong></div>
-            <div>{eventInfo.event.extendedProps.description}</div>
-            <div>
-              {eventInfo.timeText}
-            </div>
-          </>
-        }
-        arrow
-      >
-        <div
-          style={{
-            padding: "4px",
-            fontSize: "12px",
-            lineHeight: "1.2",
-            cursor: "pointer",
-          }}
-        >
-          <div style={{ fontWeight: 600 }}>
-            {eventInfo.event.title}
-          </div>
-          <div style={{ fontSize: "11px" }}>
-            {eventInfo.event.extendedProps.description}
-          </div>
+  const renderEventContent = (eventInfo) => (
+    <Tooltip
+      title={
+        <>
+          <div><strong>{eventInfo.event.title}</strong></div>
+          <div>{eventInfo.timeText}</div>
+        </>
+      }
+      arrow
+    >
+      <div style={{ padding: "4px", fontSize: "12px" }}>
+        <div style={{ fontWeight: 600 }}>
+          {eventInfo.event.title}
         </div>
-      </Tooltip>
-    );
-  };
+      </div>
+    </Tooltip>
+  );
 
-  /* =========================
-     CREATE BUTTON
-     ========================= */
   const handleCreateClick = () => {
     setSelectedEvent(null);
     setOpen(true);
   };
 
-  /* =========================
-     SLOT SELECT
-     ========================= */
   const handleDateSelect = (info) => {
     setSelectedEvent({
       start: info.startStr,
@@ -111,137 +101,58 @@ export default function Calendar() {
     setOpen(true);
   };
 
-  /* =========================
-     EVENT CLICK
-     ========================= */
   const handleEventClick = (clickInfo) => {
     const event = clickInfo.event;
 
     setSelectedEvent({
       id: event.id,
       title: event.title,
-      start: event.start,
-      end: event.end,
-      description: event.extendedProps.description,
+      start: event.startStr,
+      end: event.endStr,
     });
 
     setOpen(true);
   };
 
   /* =========================
-     SAVE (Optimistic)
+     SAVE EVENT
      ========================= */
   const handleSave = async (formData) => {
     try {
       if (formData.id) {
-        setEvents((prev) =>
-          prev.map((e) =>
-            e.id === formData.id
-              ? {
-                  ...e,
-                  title: formData.title,
-                  start: formData.start,
-                  end: formData.end,
-                  extendedProps: {
-                    description: formData.description,
-                  },
-                }
-              : e
-          )
-        );
-
         await editTimeBlocking(formData.id, formData);
       } else {
-        const tempId = Date.now().toString();
-
-        const newEvent = {
-          id: tempId,
-          title: formData.title,
-          start: formData.start,
-          end: formData.end,
-          backgroundColor: "#6264A7",
-          borderColor: "#6264A7",
-          textColor: "#ffffff",
-          extendedProps: {
-            description: formData.description,
-          },
-        };
-
-        setEvents((prev) => [...prev, newEvent]);
-
-        const response = await createTimeBlocking(formData);
-
-        setEvents((prev) =>
-          prev.map((e) =>
-            e.id === tempId
-              ? { ...e, id: response.data.id.toString() }
-              : e
-          )
-        );
+        await createTimeBlocking(formData);
       }
 
+      loadEvents();
       setOpen(false);
     } catch (error) {
       console.error("Save failed:", error);
-      loadEvents();
     }
   };
 
   /* =========================
-     DELETE
+     DELETE EVENT
      ========================= */
   const handleDelete = async (id) => {
-    const backup = [...events];
-    setEvents((prev) => prev.filter((e) => e.id !== id));
-
     try {
       await deleteTimeBlocking(id);
+      loadEvents();
       setOpen(false);
     } catch (error) {
       console.error("Delete failed:", error);
-      setEvents(backup);
-    }
-  };
-
-  /* =========================
-     DRAG
-     ========================= */
-  const handleEventDrop = async (info) => {
-    try {
-      await editTimeBlocking(info.event.id, {
-        start: info.event.start,
-        end: info.event.end,
-      });
-    } catch (error) {
-      info.revert();
-    }
-  };
-
-  /* =========================
-     RESIZE
-     ========================= */
-  const handleEventResize = async (info) => {
-    try {
-      await editTimeBlocking(info.event.id, {
-        start: info.event.start,
-        end: info.event.end,
-      });
-    } catch (error) {
-      info.revert();
     }
   };
 
   return (
     <Box sx={{ p: 2 }}>
-      <Button
-        variant="contained"
-        sx={{ mb: 2 }}
-        onClick={handleCreateClick}
-      >
+      <Button variant="contained" sx={{ mb: 2 }} onClick={handleCreateClick}>
         Create Event
       </Button>
 
       <FullCalendar
+        timeZone="local"
         plugins={[timeGridPlugin, dayGridPlugin, interactionPlugin]}
         initialView="timeGridWeek"
         headerToolbar={{
@@ -249,19 +160,14 @@ export default function Calendar() {
           center: "title",
           right: "dayGridMonth,timeGridWeek,timeGridDay",
         }}
-        slotMinTime="00:00:00"
-        slotMaxTime="24:00:00"
         allDaySlot={false}
         selectable={true}
         editable={true}
         select={handleDateSelect}
         eventClick={handleEventClick}
-        eventDrop={handleEventDrop}
-        eventResize={handleEventResize}
         events={events}
         eventContent={renderEventContent}
         height="85vh"
-        timeFormat="HH:mm"
         slotLabelFormat={{
           hour: "2-digit",
           minute: "2-digit",

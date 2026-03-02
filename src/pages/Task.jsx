@@ -8,8 +8,8 @@ import TimeBlockingTasks from "../components/TimeBlockingTasks";
 const Tasks = () => {
   return (
     <div className="tasks-page">
-      <ReminderTasks />
       <AccountabilityTasks />
+      <ReminderTasks />
       <TrackingTasks />
       <TimeBlockingTasks />
     </div>

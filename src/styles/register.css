@@ -1,101 +1,205 @@
-/* Full background */
+/* ===========================
+   RESET
+=========================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* ===========================
+   MAIN SPLIT LAYOUT
+=========================== */
 .register-page {
-  min-height: 100vh;
- background-image: url('../../public/IMG_20190202_152248.jpg');
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  background: #ffffff;
+}
+
+/* ===========================
+   LEFT IMAGE SIDE
+=========================== */
+.register-left {
+  flex: 1.2;
+  background-image: url("/login-page.png");
   background-size: cover;
   background-position: center;
-}
-
-/* Dark overlay */
-.register-overlay {
-  min-height: 100vh;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-/* App title */
-.register-title {
-  color: white;
-  font-size: 44px;
-  margin-bottom: 25px;
-  letter-spacing: 2px;
-}
-
-.register-title span {
-  color: orange;
-}
-
-/* Card */
-.register-card {
-  background: transparent;
-  width: 360px;
-  padding: 30px;
-  border-radius: 6px;
-  text-align: center;
-  /*box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);*/
-}
-
-/* Heading */
-.register-heading {
-  color: orange;
-  margin-bottom: 20px;
-}
-
-/* Inputs */
-.register-card input {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
-  border: 1px solid #aaa;
-  border-radius: 4px;
-  font-size: 14px;
-}
-
-/* Input error */
-.input-error {
-  border-color: red;
-}
-
-/* Error icon */
-.error-icon {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: red;
-  font-weight: bold;
-}
-
-/* Wrapper for input + icon */
-.input-wrapper {
   position: relative;
 }
 
-/* Button */
+/* Smooth fade into white */
+.register-left::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 200px;
+  background: linear-gradient(
+    to right,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,1) 100%
+  );
+}
+
+/* ===========================
+   RIGHT SIDE
+=========================== */
+.register-right {
+  flex: 1;
+  background: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px;
+}
+
+/* ===========================
+   CARD
+=========================== */
+.register-card {
+  width: 500px;
+  padding: 55px 50px;
+  border-radius: 25px;
+  background: #ffffff;
+  box-shadow:
+    0 25px 50px rgba(0, 0, 0, 0.08),
+    0 10px 25px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  transition: 0.3s ease;
+}
+
+.register-card:hover {
+  transform: translateY(-6px);
+}
+
+/* ===========================
+   LIFE LEDGER TITLE
+=========================== */
+.card-title {
+  font-size: 38px;
+  letter-spacing: 2px;
+  margin-bottom: 30px;
+  color: #2c5887;
+}
+
+/* ===========================
+   SUB HEADING
+=========================== */
+.register-heading {
+  font-size: 20px;
+  margin-bottom: 30px;
+  font-weight: 600;
+  color: #222;
+}
+
+/* ===========================
+   INPUTS
+=========================== */
+.register-card input {
+  width: 100%;
+  padding: 16px;
+  margin-bottom: 25px;
+  border-radius: 12px;
+  border: 1px solid #e5e5e5;
+  font-size: 15px;
+  background: #f7f9fc;
+  outline: none;
+  transition: 0.3s ease;
+}
+
+.register-card input:focus {
+  border-color: #2c5887;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(44, 88, 135, 0.15);
+}
+
+/* ===========================
+   PASSWORD WRAPPER
+=========================== */
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper input {
+  padding-right: 50px;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 16px;
+  top: 38%;
+  cursor: pointer;
+  color: #444;
+}
+
+/* ===========================
+   BUTTON
+=========================== */
 .register-card button {
   width: 100%;
-  padding: 10px;
-  background: #198754; /* green for register */
-  color: white;
+  padding: 16px;
+  border-radius: 12px;
   border: none;
-  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
-  margin-bottom: 10px;
+  background: #2c5887;
+  color: #ffffff;
+  transition: 0.3s ease;
 }
 
-/* Error text */
+.register-card button:hover {
+  background: #244a70;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(44, 88, 135, 0.25);
+}
+
+/* ===========================
+   LINK
+=========================== */
+.switch-link {
+  display: block;
+  margin-top: 25px;
+  font-size: 14px;
+  color: #555;
+  text-decoration: none;
+}
+
+.switch-link:hover {
+  color: #000;
+  text-decoration: underline;
+}
+
+/* ===========================
+   ERROR
+=========================== */
 .error-text {
-  color: red;
+  color: #e63946;
+  margin-bottom: 20px;
   font-size: 14px;
-  margin-bottom: 10px;
 }
 
-/* Switch text */
-.switch {
-  font-size: 14px;
-  cursor: pointer;
-  color: #fafbfd;
+/* ===========================
+   RESPONSIVE
+=========================== */
+@media (max-width: 900px) {
+  .register-page {
+    flex-direction: column;
+  }
+
+  .register-left {
+    height: 40vh;
+  }
+
+  .register-right {
+    height: 60vh;
+    padding: 30px;
+  }
+
+  .register-card {
+    width: 100%;
+  }
 }
