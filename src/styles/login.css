@@ -136,7 +136,7 @@
 .toggle-password {
   position: absolute;
   right: 16px;
-  top: 38%;
+  top: 26%;
   cursor: pointer;
   color: #444;
 }
@@ -211,4 +211,16 @@
   .signin-card {
     width: 100%;
   }
+}
+
+.forgot-link {
+  margin: 12px 0 20px 0;
+  font-size: 14px;
+  color: #2c5887;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.forgot-link:hover {
+  text-decoration: underline;
 }

@@ -1,21 +1,31 @@
 import { useState, useRef } from "react";
-import { signupUser } from "../api/authenticationApi";
+import { signupUser, verifyOtp, resendOtp } from "../api/authenticationApi";
+
 import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import "../styles/register.css";
 
 export default function Register() {
+
   const navigate = useNavigate();
   const emailRef = useRef(null);
 
   const [form, setForm] = useState({
     name: "",
     email: "",
-    password: "",
+    password: ""
   });
 
-  const [error, setError] = useState("");
+  const [otp, setOtp] = useState("");
+  const [otpToken, setOtpToken] = useState("");
+  const [showOtpCard, setShowOtpCard] = useState(false);
+
   const [showPassword, setShowPassword] = useState(false);
+
 
   const isValidGmail = (email) =>
     /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(email);
@@ -23,111 +33,200 @@ export default function Register() {
   const isStrongPassword = (password) =>
     /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
+
+  // ================= REGISTER =================
   async function handleRegister() {
+
     if (!form.name.trim()) {
-      setError("Enter your full name");
+      toast.error("Enter your full name");
       return;
     }
 
     if (!isValidGmail(form.email)) {
-      setError("Enter a valid Gmail address");
+      toast.error("Enter valid Gmail address");
       emailRef.current?.focus();
       return;
     }
 
     if (form.password.length < 5) {
-      setError("Password must be at least 5 characters");
+      toast.error("Password must be at least 5 characters");
       return;
     }
 
     if (!isStrongPassword(form.password)) {
-      setError("Password must include at least one special character");
+      toast.error("Password must contain a special character");
       return;
     }
 
     try {
-      setError("");
 
-      await signupUser({
+      const res = await signupUser({
         ...form,
-        email: form.email.toLowerCase().trim(),
+        email: form.email.toLowerCase().trim()
       });
 
-      alert("Account created successfully. Please login.");
-      navigate("/login");
+      setOtpToken(res.otpToken);
+
+      toast.success(res.message || "OTP sent to email");
+
+      setShowOtpCard(true);
+
     } catch (err) {
-      if (err.message?.toLowerCase().includes("already")) {
-        setError("Email already registered. Please login.");
-        emailRef.current?.focus();
-      } else {
-        setError("Unable to create account. Please try again.");
-      }
+
+      const message =
+        err?.response?.data?.message ||
+        "Unable to register";
+
+      toast.error(message);
     }
   }
+
+
+  // ================= VERIFY OTP =================
+  async function handleVerifyOtp() {
+
+    if (otp.trim().length !== 6) {
+      toast.error("Enter valid 6 digit OTP");
+      return;
+    }
+
+    try {
+
+      await verifyOtp({
+        email: form.email,
+        otp: otp.trim(),
+        otpToken: otpToken
+      });
+
+      toast.success("Email verified successfully");
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
+
+    } catch (err) {
+
+      const message =
+        err?.response?.data?.message ||
+        "Invalid OTP";
+
+      toast.error(message);
+    }
+  }
+
+
+  // ================= RESEND OTP =================
+  async function handleResendOtp() {
+
+    try {
+
+      const res = await resendOtp(form.email);
+
+      setOtpToken(res.otpToken);
+
+      toast.success("OTP resent successfully");
+
+    } catch (err) {
+
+      const message =
+        err?.response?.data?.message ||
+        "Unable to resend OTP";
+
+      toast.error(message);
+    }
+  }
+
 
   return (
     <div className="register-page">
 
-      {/* LEFT IMAGE */}
+      <ToastContainer position="top-right" autoClose={3000} />
+
       <div className="register-left"></div>
 
-      {/* RIGHT SIDE */}
       <div className="register-right">
 
         <div className="register-card">
 
-          {/* Title moved inside card */}
           <h1 className="card-title">Life Ledger</h1>
 
-          <h2 className="register-heading">Create Account</h2>
+          {!showOtpCard ? (
+            <>
+              <h2>Create Account</h2>
 
-          {error && <p className="error-text">{error}</p>}
+              <input
+                type="text"
+                placeholder="Full Name"
+                value={form.name}
+                onChange={(e) =>
+                  setForm({ ...form, name: e.target.value })
+                }
+              />
 
-          <input
-            type="text"
-            placeholder="Full Name"
-            value={form.name}
-            onChange={(e) =>
-              setForm({ ...form, name: e.target.value })
-            }
-          />
+              <input
+                ref={emailRef}
+                type="email"
+                placeholder="Email Address"
+                value={form.email}
+                onChange={(e) =>
+                  setForm({ ...form, email: e.target.value })
+                }
+              />
 
-          <input
-            ref={emailRef}
-            type="email"
-            placeholder="Email Address"
-            value={form.email}
-            onChange={(e) =>
-              setForm({ ...form, email: e.target.value })
-            }
-          />
+              <div className="password-wrapper">
 
-          <div className="password-wrapper">
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              value={form.password}
-              onChange={(e) =>
-                setForm({ ...form, password: e.target.value })
-              }
-            />
-            <span
-              className="toggle-password"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
-            </span>
-          </div>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  value={form.password}
+                  onChange={(e) =>
+                    setForm({ ...form, password: e.target.value })
+                  }
+                />
 
-          <button onClick={handleRegister}>Register</button>
+                <span
+                  className="toggle-password"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </span>
 
-          <Link to="/login" className="switch-link">
-            Already have an account? Login
-          </Link>
+              </div>
+
+              <button onClick={handleRegister}>
+                Register
+              </button>
+
+              <Link to="/login">
+                Already have an account? Login
+              </Link>
+            </>
+          ) : (
+            <>
+              <h2>Verify OTP</h2>
+
+              <input
+                type="text"
+                maxLength="6"
+                placeholder="Enter OTP"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+              />
+
+              <button onClick={handleVerifyOtp}>
+                Verify OTP
+              </button>
+
+              <p className="resend-otp" onClick={handleResendOtp}>
+                Resend OTP
+              </p>
+            </>
+          )}
 
         </div>
 
       </div>
+
     </div>
   );
 }

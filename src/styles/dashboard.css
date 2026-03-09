@@ -415,3 +415,115 @@
   color: #666;
   border-top: 1px solid #e4e7ec;
 }
+/* -------------------------- */
+/* ===============================
+   MODAL
+================================ */
+
+.modal-overlay{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.4);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:1000;
+}
+
+.modal-boxy{
+  background:#fff;
+  padding:40px;
+  border-radius:12px;
+  width:350px;
+  box-shadow:0 10px 40px rgba(0,0,0,0.15);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+
+
+.modal-boxy input{
+  width:100%;
+  padding:12px;
+  /* margin-bottom:15px; */
+  border-radius:8px;
+  border:1px solid #ddd;
+}
+
+.modal-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+}
+
+.btn-primary{
+  background:#274c77;
+  color:white;
+  border:none;
+  padding:10px 16px;
+  border-radius:6px;
+  cursor:pointer;
+}
+.btn-primary:hover{
+  background:#1e3a5f;
+}
+
+.closing-btn{
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background:none;
+  border:none;
+  padding:10px 16px;
+  border-radius:6px;
+  cursor:pointer;
+}
+.closing-btn:hover{
+color: red;
+background-color: rgba(255, 0, 0, 0.1);
+border-radius: 6px;
+}
+
+.password-field{
+  position:relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-field input{
+  width:100%;
+  padding:12px;
+  padding-right:40px;
+}
+
+.toggle-eye{
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  cursor:pointer;
+  color:#555;
+}
+
+.cancle-sec-btn{
+  background:rgb(26, 25, 25);
+  color:white;
+   border:none;
+  padding:10px 16px;
+  border-radius:6px;
+  cursor:pointer;
+}
+.cancle-sec-btn:hover{
+  background:rgb(26, 25, 25);
+  color:white;
+   border:none;
+  padding:10px 16px;
+  border-radius:6px;
+  cursor:pointer;
+  opacity:0.8;
+}
